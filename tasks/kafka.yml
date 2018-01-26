@@ -1,0 +1,44 @@
+---
+- name: setup group
+  group: name=kafka system=yes
+
+- name: Setup user
+  user: name=kafka system=yes group=kafka
+
+- name: Fetch kafka binary package
+  get_url: dest="/tmp" url="{{kafka_url}}"
+
+- name: Uncompress the kafka tar
+  unarchive: copy=no creates={{kafka_dir}} dest=/opt src="/tmp/kafka-{{ kafka_version }}-src.tgz"
+
+# The file name might be change in the future release
+- name: Rename the kafka folder 
+  command: mv /opt/kafka-{{ kafka_version }} /opt/kafka
+  ignore_errors: yes
+
+- name: change ownership on kafka directory
+  file: path={{ kafka_dir }} state=directory owner=kafka group=kafka recurse=yes
+
+- name: create upstart config
+  template: dest=/etc/init/kafka.conf owner=root group=root mode=644 src=kafka.conf.j2
+  notify: restart kafka
+  tags: [kafka_config]
+
+- name: Create data_dir
+  file: path={{kafka_data_dir}} state=directory recurse=yes owner=kafka group=kafka 
+
+- name: Create log_dir
+  file: path={{kafka_log_dir}}  state=directory recurse=yes owner=kafka group=kafka mode=755
+
+- name: config kafka
+  template: src={{ item }}.j2 dest={{ kafka_dir }}/config/{{ item }} owner=zookeeper group=zookeeper
+  with_items:
+    - log4j.properties
+    - server.properties
+  tags: [kafka_config]
+  notify:
+    - restart kafka
+
+- name: start kafka
+  service: name=kafka state=started enabled=yes
+  tags: [kafka_config]

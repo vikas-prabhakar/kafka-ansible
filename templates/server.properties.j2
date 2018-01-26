@@ -1,0 +1,32 @@
+broker.id={{ansible_hostname| regex_replace('[a-z]*')  }}
+host.name={{ ansible_default_ipv4.address }}
+
+num.network.threads={{kafka_num_network_threads}}
+num.io.threads={{kafka_num_io_threads}}
+num.partitions={{kafka_num_partitions}}
+auto.create.topics.enable={{kafka_auto_create_topics}}
+log.dirs={{kafka_data_dir}}
+
+socket.send.buffer.bytes={{kafka_socket_send_buffer_bytes}}
+socket.receive.buffer.bytes={{kafka_socket_receive_buffer_bytes}}
+socket.request.max.bytes={{kafka_socket_request_max_bytes}}
+
+
+
+
+
+log.flush.interval.messages={{kafka_log_flush_interval_messages}}
+log.flush.interval.ms={{kafka_log_flush_interval_ms}}
+
+
+
+log.retention.hours={{kafka_log_retention_hours}}
+log.retention.bytes={{kafka_log_retention_bytes}}
+log.segment.bytes={{kafka_log_segment_bytes}}
+log.retention.check.interval.ms=60000
+log.cleaner.enable=false
+
+
+zookeeper.connect={% for host in groups[zookeeper_group] %}{{host}}:2181{% if not loop.last %},{% endif %}{% endfor %}
+
+zookeeper.connection.timeout.ms={{zookeeper_connection_timeout_ms}}
