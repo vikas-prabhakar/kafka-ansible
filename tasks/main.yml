@@ -1,2 +1,5 @@
 ---
+- include: kfebs.yml tags=additional_kfebs
+  when: kfebs_vol is defined
+
 - include: kafka.yml tags=kafka
