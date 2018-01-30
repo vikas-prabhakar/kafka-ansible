@@ -24,6 +24,10 @@
   notify: restart kafka
   tags: [kafka_config]
 
+- name: Add JMX_PORT in start script
+  lineinfile: dest="{{kafka_dir}}/bin/kafka-server-start.sh" regexp='^export JMX_PORT=' insertafter='^esac' create=True line="export JMX_PORT=${JMX_PORT:-9999}"
+  tags: [export_jmx]
+
 - name: Create data_dir
   file: path={{kafka_data_dir}} state=directory recurse=yes owner=kafka group=kafka 
 
