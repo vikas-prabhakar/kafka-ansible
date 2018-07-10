@@ -1,5 +1,7 @@
-broker.id={{ansible_hostname| regex_replace('[a-z]*')  }}
+broker.id={{ ansible_default_ipv4.address.split('.')[2] }}{{ ansible_default_ipv4.address.split('.')[3] }}
 host.name={{ ansible_default_ipv4.address }}
+# Max number that can be used for a broker.id
+reserved.broker.max.id={{ kafka_reserved_broker_max_id }}
 
 num.network.threads={{kafka_num_network_threads}}
 num.io.threads={{kafka_num_io_threads}}
